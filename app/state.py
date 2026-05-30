@@ -5,3 +5,4 @@ class AgentState(TypedDict):
     plan: str
     research: str
     summary: str
+    final_answer: str

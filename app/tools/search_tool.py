@@ -1,30 +1,33 @@
+import os
+
+from tavily import TavilyClient
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = TavilyClient(
+    api_key=os.getenv("TAVILY_API_KEY")
+)
+
+
 def search_tool(query: str):
 
-    mock_results = {
-        "nvidia":
-            "Nvidia is investing heavily in AI chips, robotics and agentic AI.",
-    }
+    response = client.search(
+        query=query,
+        search_depth="advanced",
+        max_results=5
+    )
 
-    query_lower = query.lower()
+    results = []
 
-    for key in mock_results:
-        if key in query_lower:
-            return mock_results[key]
+    for item in response["results"]:
 
-    return "No results found."
+        results.append(
+            f"""
+Title: {item['title']}
+Content: {item['content']}
+URL: {item['url']}
+"""
+        )
 
-# Why Mock Tool First?
-
-# Because we want to understand:
-
-# Agent
-# ↓
-# Tool
-# ↓
-# Result
-
-# before introducing:
-
-# Tavily
-# Serper
-# Web APIs
+    return "\n\n".join(results)
