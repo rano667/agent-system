@@ -482,4 +482,99 @@ to:
 Specialized workflows
 
 That's exactly how real agent systems evolve.
+---
+What We Want (V4)
+
+Instead:
+
+User Query
+↓
+LLM Planner
+↓
+Decides Tool
+↓
+Execute Tool
+
+Example:
+
+User:
+
+How many products are in invoice 1213?
+
+LLM:
+
+{
+  "route": "rag"
+}
+
+User:
+
+What is 25 * 42?
+
+LLM:
+
+{
+  "route": "calculator"
+}
+
+User:
+
+What are Nvidia's latest AI initiatives?
+
+LLM:
+
+{
+  "route": "research"
+}
+Why This Is Better
+
+Because eventually you'll have:
+
+RAG
+Search
+Calculator
+Memory
+Database
+Code Execution
+Email
+Slack
+Calendar
+CRM
+
+Writing:
+
+if ...
+elif ...
+elif ...
+elif ...
+
+becomes impossible.
+---
+Why?
+
+We want structured output.
+
+Instead of:
+
+I think you should use search.
+
+We want:
+
+{
+  "route": "research"
+}
+
+Machine readable.
+---
+What Happens?
+
+For:
+
+What products are in invoice 1213?
+
+The model returns:
+
+RouteDecision(
+    route="rag"
+)
         

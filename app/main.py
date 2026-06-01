@@ -2,7 +2,7 @@ from app.graph import graph
 
 result = graph.invoke(
     {
-        "query": "What products are in invoice 1213?"
+        "query": "Latest Google AI initiatives"
     }
 )
 
