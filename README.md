@@ -325,3 +325,161 @@ Conditional Edges
 builder.add_conditional_edges(...)
 
 instead of builder.add_edge("planner", "researcher")
+---
+This Is Actually A Design Smell
+
+Your graph currently looks like:
+
+Planner
+ ↓
+Conditional Route
+ ↓
+Research / Calculator / RAG
+ ↓
+One Universal Summarizer
+
+The problem is:
+
+Different routes
+Different output requirements
+---
+
+Agent V3.5
+
+Instead of:
+
+Research
+Calculator
+RAG
+ ↓
+Same Summarizer
+
+they do:
+
+Research
+ ↓
+Research Summarizer
+
+Calculator
+ ↓
+Calculator Formatter
+
+RAG
+ ↓
+RAG Formatter
+
+Each path has its own response style.
+---
+
+Research Route
+Planner
+ ↓
+Researcher
+ ↓
+Research Summarizer
+ ↓
+END
+Calculator Route
+Planner
+ ↓
+Calculator
+ ↓
+END
+
+Calculator already knows the answer.
+
+No LLM needed.
+
+RAG Route
+Planner
+ ↓
+RAG
+ ↓
+END
+
+Your RAG system already generates a user-ready answer.
+
+No reason to summarize again.
+---
+
+Better Graph
+                    Planner
+                       │
+         ┌─────────────┼─────────────┐
+         │             │             │
+         ▼             ▼             ▼
+      Research     Calculator       RAG
+         │             │             │
+         ▼             ▼             ▼
+ ResearchSummary      END           END
+         │
+         ▼
+        END
+
+Not every node should use an LLM.
+---
+
+Expected Results
+Query
+Latest Nvidia AI initiatives
+
+Flow:
+
+Planner
+↓
+Research
+↓
+ResearchSummary
+↓
+END
+
+Output:
+
+Key Findings...
+Important Technologies...
+Business Impact...
+Query
+calculate 25 * 42
+
+Flow:
+
+Planner
+↓
+Calculator
+↓
+END
+
+Output:
+
+25 * 42 = 1050
+Query
+What products are in invoice 1213?
+
+Flow:
+
+Planner
+↓
+RAG
+↓
+END
+
+Output:
+
+Actual invoice answer
+
+No fake business impact nonsense.
+
+What You Just Learned
+
+This is one of the biggest transitions in agent design:
+
+From:
+
+One giant LLM does everything
+
+to:
+
+Specialized workflows
+
+That's exactly how real agent systems evolve.
+        

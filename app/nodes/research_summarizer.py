@@ -4,7 +4,7 @@ from app.llm import get_llm
 llm = get_llm()
 
 
-def summarizer_node(state: AgentState):
+def research_summarizer_node(state: AgentState):
 
     query = state["query"]
     research = state["research"]
@@ -24,12 +24,11 @@ Generate:
 2. Important Technologies
 3. Business Impact
 
-Keep answer concise.
+Keep answer concise and factual.
 """
 
     response = llm.invoke(prompt)
 
     return {
-        "summary": response.content,
         "final_answer": response.content
     }

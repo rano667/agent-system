@@ -12,11 +12,13 @@ def calculator_node(state):
         result = eval(expression)
 
         return {
-            "research": f"Result = {result}"
+            "final_answer":
+                f"{expression} = {result}"
         }
 
     except Exception:
 
         return {
-            "research": "Unable to calculate."
+            "final_answer":
+                "Unable to calculate."
         }
