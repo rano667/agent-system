@@ -1,15 +1,27 @@
-from app.state import AgentState
+def planner_node(state):
 
-def planner_node(state: AgentState):
+    query = state["query"].lower()
 
-    query = state["query"]
+    if any(word in query for word in [
+        "invoice",
+        "product",
+        "buyer",
+        "total due"
+    ]):
+        route = "rag"
 
-    plan = f"""
-    1. Research topic: {query}
-    2. Gather information
-    3. Summarize findings
-    """
+    elif any(word in query for word in [
+        "calculate",
+        "+",
+        "-",
+        "*",
+        "/"
+    ]):
+        route = "calculator"
+
+    else:
+        route = "research"
 
     return {
-        "plan": plan
+        "route": route
     }
