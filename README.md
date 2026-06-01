@@ -1,3 +1,22 @@
+queries to try:
+1. What products are in invoice 1213?
+
+2. What is the total due in invoice 1213 and what would it be after a 10% increase?
+
+3. Compare the latest Nvidia AI initiatives with the products in invoice 1213
+
+change the query in main.py
+
+install dependencies:
+'''
+pip install -r requirements.txt
+'''
+
+run:
+'''
+python -m app.main
+'''
+---
 DAY 1 — AGENT FOUNDATIONS
 
 Nodes = actions
@@ -1010,4 +1029,51 @@ and
 RAG Tool
 
 into the registry.
+---
+Your agent can already:
+
+Planner (LLM)
+ ↓
+Generate Tool Calls
+ ↓
+Tool Executor
+ ├── Search Tool
+ ├── Calculator Tool
+ └── RAG Tool
+ ↓
+Summarizer
+ ↓
+Answer
+
+And this output proves it:
+
+tool_calls=[
+    ToolCall(tool='search', input='Nvidia market cap'),
+    ToolCall(tool='calculator', input='Nvidia market cap * 1.2')
+]
+
+The planner is thinking in steps.
+
+First Observation
+
+This worked:
+
+What is Nvidia's market cap and what would it be after 20 percent growth?
+
+But there's a hidden problem.
+
+The planner generated:
+
+ToolCall(
+    tool='calculator',
+    input='Nvidia market cap * 1.2'
+)
+
+The calculator has no idea what:
+
+"Nvidia market cap"
+
+means.
+
+The only reason the answer worked is probably because your summarizer used the search result and inferred the calculation.
 ---
