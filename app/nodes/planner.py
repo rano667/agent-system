@@ -1,43 +1,45 @@
 from app.llm import get_llm
-from app.schemas.router import RouteDecision
 
+from app.schemas.router import RouteDecision
+from app.schemas.tool_call import ToolCall
+
+from pydantic import BaseModel
+    
 llm = get_llm()
+
+class PlannerOutput(BaseModel):
+    tool_calls: list[ToolCall]
 
 def planner_node(state):
 
     query = state["query"]
 
     prompt = f"""
-You are a routing agent.
+You are an AI planning agent.
 
-Choose ONE route:
+Available tools:
+- search
+- calculator
+- rag
 
-research
-calculator
-rag
-
-Rules:
-
-- Use rag for invoices, products, buyers, totals.
-- Use calculator for math.
-- Use research for current events, companies, technologies.
+Generate the tool calls required
+to answer the user's query.
 
 Query:
 {query}
-
-Return ONLY the route.
 """
 
     structured_llm = llm.with_structured_output(
-        RouteDecision
+        PlannerOutput
     )
 
     decision = structured_llm.invoke(prompt)
     
     # Temp Debuggning logs
-    print("\n🧠 ROUTE DECISION")
-    print(decision.route)
+    print("\n🧠 RAW DECISION:")
+    print(decision)
+    print(type(decision))
 
     return {
-        "route": decision.route
+        "tool_calls": decision.tool_calls
     }

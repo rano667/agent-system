@@ -577,4 +577,437 @@ The model returns:
 RouteDecision(
     route="rag"
 )
-        
+---
+
+But Here's the Big Insight
+
+This is still:
+
+LLM decides
+↓
+Graph executes
+
+The graph is still in control.
+
+Not the LLM.
+
+That's why LangGraph systems are much more reliable than "fully autonomous" agents.
+---
+🚀 Agent V5 (Next)
+
+After V4 works, we'll build:
+
+Multi-Tool Agent
+
+Instead of:
+
+One tool chosen
+
+the planner can decide:
+
+Search
+↓
+Calculator
+↓
+Search Again
+↓
+Summarize
+
+Multiple tool calls in a single execution.
+
+That is where the system starts resembling real-world AI agents.
+---
+🧠 First Understand The Difference
+V4
+User Query
+↓
+Planner
+↓
+Choose ONE Tool
+↓
+Answer
+
+Example:
+
+What is 25 * 42?
+
+Tool:
+
+Calculator
+
+Done.
+
+V5
+User Query
+↓
+Planner
+↓
+Tool A
+↓
+Tool B
+↓
+Tool C
+↓
+Final Answer
+
+Example:
+
+What is Nvidia's latest market cap and what would it be worth if it grew by 20%?
+
+Agent must:
+
+Search Tool
+↓
+Get market cap
+↓
+Calculator Tool
+↓
+Apply +20%
+↓
+Answer
+
+Multiple tools.
+---
+🚀 Agent V5 Architecture
+
+Instead of:
+
+Planner
+↓
+Research
+
+we create:
+
+Planner
+↓
+Agent Executor
+↓
+Tool Loop
+↓
+Final Answer
+---
+Why?
+
+Agent execution is no longer:
+
+Tool
+↓
+Result
+
+It's:
+
+Tool
+↓
+Observation
+↓
+Tool
+↓
+Observation
+↓
+Tool
+↓
+Answer
+
+We need memory of what happened.
+---
+
+User:
+
+What is Nvidia's market cap and what if it grows by 20%?
+
+Planner:
+
+{
+  "tool_calls": [
+    {
+      "tool": "search",
+      "input": "Nvidia market cap"
+    },
+    {
+      "tool": "calculator",
+      "input": "market_cap * 1.2"
+    }
+  ]
+}
+
+Now we have a plan.
+---
+What Is Happening?
+
+Agent can now execute:
+
+1 Tool
+2 Tools
+10 Tools
+
+without changing graph structure.
+
+This is huge.
+---
+Planner Upgrade
+
+Instead of:
+
+return {
+    "route": "research"
+}
+
+LLM returns:
+
+return {
+    "tool_calls": [
+        {
+            "tool": "search",
+            "input": query
+        }
+    ]
+}
+---
+New Graph
+START
+ ↓
+Planner
+ ↓
+Tool Executor
+ ↓
+Summarizer
+ ↓
+END
+
+Notice something.
+
+We removed:
+
+Research Node
+Calculator Node
+RAG Node
+
+because now:
+
+Tool Executor
+
+handles all tools.
+
+This is much closer to modern agents.
+---
+Why This Matters
+
+You are moving from:
+
+Workflow Agent
+
+to:
+
+Tool-Using Agent
+
+This is the architecture behind:
+
+OpenAI Agents SDK
+LangGraph Agents
+Claude Tool Use
+Cursor
+Windsurf
+Manus
+Devin (simplified)
+---
+if we jump immediately from V4 → full Tool Executor, you'll lose one of the most important LangGraph concepts:
+
+Agent Loops
+
+Right now we have:
+
+START
+ ↓
+Planner
+ ↓
+Tool Executor
+ ↓
+Summarizer
+ ↓
+END
+
+This is still:
+
+Plan Once
+Execute Once
+Answer
+
+Not really agentic yet.
+
+What Makes An Agent Feel Intelligent?
+
+This:
+
+Thought
+↓
+Tool
+↓
+Observation
+↓
+Thought
+↓
+Tool
+↓
+Observation
+↓
+Answer
+
+The agent reasons after seeing tool output.
+
+Example
+
+User:
+
+What is Nvidia's market cap and what would it be after 20% growth?
+
+Agent:
+
+Thought:
+I need market cap.
+
+↓
+
+Tool:
+Search Nvidia market cap
+
+↓
+
+Observation:
+4.2 Trillion
+
+↓
+
+Thought:
+Now I need to calculate 20% growth.
+
+↓
+
+Tool:
+Calculator
+
+↓
+
+Observation:
+5.04 Trillion
+
+↓
+
+Final Answer
+
+That's the behavior we actually want.
+---
+Agent V5 Architecture
+START
+ ↓
+Planner
+ ↓
+Tool Executor
+ ↓
+Reasoner
+ ├───────────────┐
+ │               │
+ │ Need Tool?    │
+ │               │
+ └── YES ────────┘
+ ↓
+NO
+ ↓
+Final Answer
+ ↓
+END
+
+This is much closer to LangGraph's strengths.
+---
+But Let's Build Incrementally
+
+Today we'll build:
+
+V5.1 — Multi-Tool Infrastructure
+
+Goal:
+
+Planner
+↓
+Tool Executor
+↓
+Summarizer
+↓
+END
+
+with support for multiple tools.
+
+No loops yet.
+---
+Upgrade Planner
+
+Instead of deciding:
+
+route="research"
+
+it generates:
+
+tool_calls=[
+    {
+        "tool": "search",
+        "input": query
+    }
+]
+---
+Current Architecture
+START
+ ↓
+Planner (LLM)
+ ↓
+Tool Executor
+ ↓
+Search Tool
+ ↓
+Summarizer
+ ↓
+END
+
+And it's working.
+---
+What We Have Actually Built
+
+If we compare:
+
+V1
+Query
+↓
+Hardcoded Node
+↓
+Answer
+V3
+Query
+↓
+Rule-Based Routing
+↓
+Tool
+↓
+Answer
+V5
+Query
+↓
+LLM Planner
+↓
+Tool Calls
+↓
+Tool Executor
+↓
+LLM Summary
+↓
+Answer
+
+This is much closer to modern agent frameworks.
+---
+Now we can finally add:
+
+Calculator Tool
+
+and
+
+RAG Tool
+
+into the registry.
+---

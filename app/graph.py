@@ -4,37 +4,51 @@ from app.state import AgentState
 
 from app.routers.query_router import route_query
 
+from app.nodes.tool_executor import tool_executor_node
 from app.nodes.planner import planner_node
 from app.nodes.researcher import researcher_node
 from app.nodes.calculator import calculator_node
 from app.nodes.rag import rag_node
-from app.nodes.research_summarizer import research_summarizer_node
+from app.nodes.summarizer import summarizer_node
 
 
 builder = StateGraph(AgentState)
 
 # Add nodes
-builder.add_node("planner", planner_node)
-builder.add_node("calculator", calculator_node)
-builder.add_node("rag", rag_node)
-builder.add_node("researcher", researcher_node)
-builder.add_node("research_summary", research_summarizer_node)
-
-# Add edges
-builder.add_edge(START, "planner")
-builder.add_conditional_edges(
+builder.add_node(
     "planner",
-    route_query,
-    {
-        "research": "researcher",
-        "calculator": "calculator",
-        "rag": "rag"
-    }
+    planner_node
 )
-builder.add_edge("researcher", "research_summary")
-builder.add_edge("calculator", END)
-builder.add_edge("rag", END)
-builder.add_edge("research_summary", END)
+
+builder.add_node(
+    "tool_executor",
+    tool_executor_node
+)
+
+builder.add_node(
+    "summarizer",
+    summarizer_node
+)
+
+builder.add_edge(
+    START,
+    "planner"
+)
+
+builder.add_edge(
+    "planner",
+    "tool_executor"
+)
+
+builder.add_edge(
+    "tool_executor",
+    "summarizer"
+)
+
+builder.add_edge(
+    "summarizer",
+    END
+)
 
 graph = builder.compile()
 
